@@ -13,7 +13,7 @@ jobs:
           fetch-depth: 0
       - id: output-dirs
         run: echo "dirs=$(git diff --name-only origin/${{ github.base_ref }} -- aws-glue-resources/* | cut -d/ -f2 | uniq | jq --compact-output --raw-input --slurp 'split("\n")[:-1]')" >> "$GITHUB_OUTPUT"
-  tests-aws-glue-resource:
+  tests-aws-glue:
     needs: init
     runs-on: ubuntu-latest
     strategy:

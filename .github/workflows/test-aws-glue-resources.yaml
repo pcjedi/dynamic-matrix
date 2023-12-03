@@ -3,13 +3,22 @@ on:
     paths:
       - "aws-glue-resources/**"
 jobs:
-  tests:
+  init:
+    runs-on: ubuntu-latest
+    outputs:
+      dirs: ${{ steps.output-dirs.outputs.dirs }}
+    steps:
+      - uses: actions/checkout@main
+        with:
+          fetch-depth: 0
+      - id: output-dirs
+        run: echo "dirs=$(git diff --name-only origin/${{ github.base_ref }} -- aws-glue-resources/* | cut -d/ -f2 | uniq | jq --compact-output --raw-input --slurp 'split("\n")[:-1]')" >> "$GITHUB_OUTPUT"
+  tests-aws-glue:
+    needs: init
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dir:
-          - resource1
-          - resource2
+        dir: ${{ fromJson(needs.init.outputs.dirs) }}
     steps:
       - uses: actions/checkout@main
       - uses: actions/setup-python@main

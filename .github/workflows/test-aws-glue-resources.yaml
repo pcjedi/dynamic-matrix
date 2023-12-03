@@ -4,7 +4,7 @@ on:
       - "aws-glue-resources/**"
 jobs:
   init:
-    runs-on: ubuntu-lates
+    runs-on: ubuntu-latest
     outputs:
       dirs: ${{ steps.output-dirs.outputs.dirs }}
     steps:

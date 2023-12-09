@@ -24,7 +24,7 @@ jobs:
         run: echo "workflowfilechanged=$(git diff origin/${{ github.base_ref }} --name-only -- ${{ github.workflow }} )" >> "$GITHUB_ENV"
       - name: all testable dirs if workflowfile changed
         if: env.workflowfilechanged
-        run: echo "dirs=$(ls -d lambdas/*/tests | cut -d/ -f2 | jq --compact-output --raw-input --slurp 'split("\n")[:-1]')" >> $GITHUB_ENV
+        run: echo "dirs=$(ls -d aws-glue-resources/* | cut -d/ -f2 | jq --compact-output --raw-input --slurp 'split("\n")[:-1]')" >> $GITHUB_ENV
       - id: output-dirs
         run: echo "dirs=$dirs" >> "$GITHUB_OUTPUT"
         

@@ -2,6 +2,7 @@ on:
   pull_request:
     paths:
       - "aws-glue-resources/**"
+      - .github/workflows/test-aws-glue-resources.yaml
 jobs:
   init:
     runs-on: ubuntu-latest
@@ -11,14 +12,22 @@ jobs:
       - uses: actions/checkout@main
         with:
           fetch-depth: 0
-      - id: output-dirs
-        run: >
+    
+      - run: >
           echo "dirs=$(
             git diff --name-only origin/${{ github.base_ref }} -- aws-glue-resources/* | 
             cut -d/ -f2 | 
             uniq | 
             jq --compact-output --raw-input --slurp 'split("\n")[:-1]'
-          )" >> "$GITHUB_OUTPUT"
+          )" >> "$GITHUB_ENV"
+      - name: check if workflow file changed
+        run: echo "workflowfilechanged=$(git diff origin/${{ github.base_ref }} --name-only -- ${{ github.workflow }} )" >> "$GITHUB_ENV"
+      - name: all testable dirs if workflowfile changed
+        if: env.workflowfilechanged
+        run: echo "dirs=$(ls -d aws-glue-resources/* | cut -d/ -f2 | jq --compact-output --raw-input --slurp 'split("\n")[:-1]')" >> $GITHUB_ENV
+      - id: output-dirs
+        run: echo "dirs=$dirs" >> "$GITHUB_OUTPUT"
+        
   tests-aws-glue:
     needs: init
     runs-on: ubuntu-latest

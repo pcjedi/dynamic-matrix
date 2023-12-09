@@ -2,6 +2,7 @@ on:
   pull_request:
     paths:
       - "aws-glue-resources/**"
+      - .github/workflows/test-aws-glue-resources.yaml
 jobs:
   init:
     runs-on: ubuntu-latest

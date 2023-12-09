@@ -38,7 +38,7 @@ jobs:
 
   tests-aws-glue:
     needs: init
-    if: ${{ needs.init.outputs.dirs }} != "[]"
+    if: needs.init.outputs.dirs != '[]'
     runs-on: ubuntu-latest
     strategy:
       matrix:

@@ -18,9 +18,9 @@ jobs:
         with:
           fetch-depth: 0
       - if: github.event_name == 'pull_request'
-        run: echo "gitdiffref=origin/${{ github.base_ref }}"
+        run: echo "gitdiffref=origin/${{ github.base_ref }}" >> "$GITHUB_ENV"
       - if: github.event_name == 'push'
-        run: echo "gitdiffref=${{ github.event.before }}"
+        run: echo "gitdiffref=${{ github.event.before }}" >> "$GITHUB_ENV"
       - run: >
           echo "dirs=$(
             git diff --name-only ${{ env.gitdiffref }} -- aws-glue-resources/* | 

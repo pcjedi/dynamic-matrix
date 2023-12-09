@@ -1,4 +1,6 @@
 on:
+  workflow_dispatch:
+  push:
   pull_request:
     paths:
       - "aws-glue-resources/**"
@@ -26,7 +28,7 @@ jobs:
         run: echo "dirs=$(ls -d aws-glue-resources/* | cut -d/ -f2 | jq --compact-output --raw-input --slurp 'split("\n")[:-1]')" >> $GITHUB_ENV
       - id: output-dirs
         run: echo "dirs=$dirs" >> "$GITHUB_OUTPUT"
-        
+
   tests-aws-glue:
     needs: init
     runs-on: ubuntu-latest

@@ -1,4 +1,9 @@
 on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "aws-glue-resources/**"
+      - .github/workflows/test-aws-glue-resources.yaml
   pull_request:
     paths:
       - "aws-glue-resources/**"
@@ -12,23 +17,28 @@ jobs:
       - uses: actions/checkout@main
         with:
           fetch-depth: 0
+      - if: github.event_name == 'pull_request'
+        run: echo "gitdiffref=origin/${{ github.base_ref }}" >> "$GITHUB_ENV"
+      - if: github.event_name == 'push'
+        run: echo "gitdiffref=${{ github.event.before }}" >> "$GITHUB_ENV"
       - run: >
           echo "dirs=$(
-            git diff --name-only origin/${{ github.base_ref }} -- aws-glue-resources/* | 
+            git diff --name-only ${{ env.gitdiffref }} -- aws-glue-resources/* | 
             cut -d/ -f2 | 
             uniq | 
             jq --compact-output --raw-input --slurp 'split("\n")[:-1]'
           )" >> "$GITHUB_ENV"
       - name: check if workflow file changed
-        run: echo "workflowfilechanged=$(git diff origin/${{ github.base_ref }} --name-only -- ${{ github.workflow }} )" >> "$GITHUB_ENV"
+        run: echo "workflowfilechanged=$(git diff ${{ env.gitdiffref }} --name-only -- ${{ github.workflow }} )" >> "$GITHUB_ENV"
       - name: all testable dirs if workflowfile changed
-        if: env.workflowfilechanged
+        if: env.workflowfilechanged  ==  github.workflow  ||  github.event_name == 'workflow_dispatch'
         run: echo "dirs=$(ls -d aws-glue-resources/* | cut -d/ -f2 | jq --compact-output --raw-input --slurp 'split("\n")[:-1]')" >> $GITHUB_ENV
       - id: output-dirs
         run: echo "dirs=$dirs" >> "$GITHUB_OUTPUT"
-        
+
   tests-aws-glue:
     needs: init
+    if: needs.init.outputs.dirs != '[]'
     runs-on: ubuntu-latest
     strategy:
       matrix:

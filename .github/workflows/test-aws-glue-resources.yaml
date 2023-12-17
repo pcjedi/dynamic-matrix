@@ -4,6 +4,8 @@ on:
     paths:
       - "aws-glue-resources/**"
       - .github/workflows/test-aws-glue-resources.yaml
+    branches:
+      - main
   pull_request:
     paths:
       - "aws-glue-resources/**"
